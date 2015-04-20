@@ -5,7 +5,7 @@
 #### `maximum`
 
 ``` purescript
-maximum :: Sample -> Maybe Number
+maximum :: Sample -> Maybe Point
 ```
 
 Maximum value.
@@ -13,7 +13,7 @@ Maximum value.
 #### `minimum`
 
 ``` purescript
-minimum :: Sample -> Maybe Number
+minimum :: Sample -> Maybe Point
 ```
 
 Minimum value.
@@ -21,7 +21,7 @@ Minimum value.
 #### `mean`
 
 ``` purescript
-mean :: Sample -> Maybe Number
+mean :: Sample -> Maybe Point
 ```
 
 Mean.
@@ -29,7 +29,7 @@ Mean.
 #### `harmean`
 
 ``` purescript
-harmean :: Sample -> Maybe Number
+harmean :: Sample -> Maybe Point
 ```
 
 Harmonic mean.
@@ -37,7 +37,7 @@ Harmonic mean.
 #### `geomean`
 
 ``` purescript
-geomean :: Sample -> Maybe Number
+geomean :: Sample -> Maybe Point
 ```
 
 Geometric mean.
@@ -45,7 +45,7 @@ Geometric mean.
 #### `median`
 
 ``` purescript
-median :: Sample -> Maybe Number
+median :: Sample -> Maybe Point
 ```
 
 Median.
@@ -53,7 +53,7 @@ Median.
 #### `modes`
 
 ``` purescript
-modes :: Sample -> [Tuple Number Number]
+modes :: Sample -> [Tuple Int Point]
 ```
 
 Modes returns a sorted list of modes in descending order.
@@ -61,7 +61,7 @@ Modes returns a sorted list of modes in descending order.
 #### `mode`
 
 ``` purescript
-mode :: Sample -> Maybe Number
+mode :: Sample -> Maybe Point
 ```
 
 Mode returns the mode of the list.
@@ -69,7 +69,7 @@ Mode returns the mode of the list.
 #### `centralMoment`
 
 ``` purescript
-centralMoment :: Sample -> Number -> Maybe Number
+centralMoment :: Int -> Sample -> Maybe Number
 ```
 
 Central moments.
@@ -191,10 +191,17 @@ type Int = Number
 ```
 
 
+#### `Point`
+
+``` purescript
+type Point = Number
+```
+
+
 #### `Sample`
 
 ``` purescript
-type Sample = [Number]
+type Sample = [Point]
 ```
 
 
@@ -225,7 +232,7 @@ even :: Int -> Boolean
 #### `maximum`
 
 ``` purescript
-maximum :: [Number] -> Number
+maximum :: Sample -> Point
 ```
 
 Maximum value.
@@ -233,7 +240,7 @@ Maximum value.
 #### `minimum`
 
 ``` purescript
-minimum :: [Number] -> Number
+minimum :: Sample -> Point
 ```
 
 Minimum value.
@@ -241,7 +248,7 @@ Minimum value.
 #### `mean`
 
 ``` purescript
-mean :: [Number] -> Number
+mean :: Sample -> Point
 ```
 
 Mean.
@@ -249,7 +256,7 @@ Mean.
 #### `harmean`
 
 ``` purescript
-harmean :: [Number] -> Number
+harmean :: Sample -> Point
 ```
 
 Harmonic mean.
@@ -257,7 +264,7 @@ Harmonic mean.
 #### `geomean`
 
 ``` purescript
-geomean :: [Number] -> Number
+geomean :: Sample -> Point
 ```
 
 Geometric mean.
@@ -265,7 +272,7 @@ Geometric mean.
 #### `median`
 
 ``` purescript
-median :: [Number] -> Number
+median :: Sample -> Point
 ```
 
 Median.
@@ -273,7 +280,7 @@ Median.
 #### `modes`
 
 ``` purescript
-modes :: [Number] -> [Tuple Number Number]
+modes :: Sample -> [Tuple Int Point]
 ```
 
 Modes returns a sorted list of modes in descending order.
@@ -281,7 +288,7 @@ Modes returns a sorted list of modes in descending order.
 #### `mode`
 
 ``` purescript
-mode :: [Number] -> Number
+mode :: Sample -> Point
 ```
 
 Mode returns the mode of the non-empty list.
@@ -289,7 +296,7 @@ Mode returns the mode of the non-empty list.
 #### `skew`
 
 ``` purescript
-skew :: [Number] -> Number
+skew :: Sample -> Number
 ```
 
 Calculate skew.
@@ -297,7 +304,7 @@ Calculate skew.
 #### `pearsonSkew`
 
 ``` purescript
-pearsonSkew :: [Number] -> Number
+pearsonSkew :: Sample -> Number
 ```
 
 Calculates pearson skew.
@@ -305,7 +312,7 @@ Calculates pearson skew.
 #### `stddev`
 
 ``` purescript
-stddev :: [Number] -> Number
+stddev :: Sample -> Number
 ```
 
 Standard deviation of sample.
@@ -313,7 +320,7 @@ Standard deviation of sample.
 #### `stddevp`
 
 ``` purescript
-stddevp :: [Number] -> Number
+stddevp :: Sample -> Number
 ```
 
 Standard deviation of population.
@@ -321,7 +328,7 @@ Standard deviation of population.
 #### `var`
 
 ``` purescript
-var :: [Number] -> Number
+var :: Sample -> Number
 ```
 
 Sample variance.
@@ -329,7 +336,7 @@ Sample variance.
 #### `pvar`
 
 ``` purescript
-pvar :: [Number] -> Number
+pvar :: Sample -> Number
 ```
 
 Population variance.
@@ -337,7 +344,7 @@ Population variance.
 #### `centralMoment`
 
 ``` purescript
-centralMoment :: [Number] -> Number -> Number
+centralMoment :: Int -> Sample -> Number
 ```
 
 Central moments.
@@ -345,7 +352,7 @@ Central moments.
 #### `range`
 
 ``` purescript
-range :: [Number] -> Number
+range :: Sample -> Number
 ```
 
 Range.
@@ -353,7 +360,7 @@ Range.
 #### `avgdev`
 
 ``` purescript
-avgdev :: [Number] -> Number
+avgdev :: Sample -> Number
 ```
 
 Average deviation.
@@ -361,7 +368,7 @@ Average deviation.
 #### `iqr`
 
 ``` purescript
-iqr :: [Number] -> Number
+iqr :: Sample -> Number
 ```
 
 Interquartile range.
@@ -369,7 +376,7 @@ Interquartile range.
 #### `iqr'`
 
 ``` purescript
-iqr' :: [Number] -> Number
+iqr' :: Sample -> Number
 ```
 
 Interquartile range for sorted data.
@@ -377,7 +384,7 @@ Interquartile range for sorted data.
 #### `kurt`
 
 ``` purescript
-kurt :: [Number] -> Number
+kurt :: Sample -> Number
 ```
 
 Kurtosis.
@@ -385,17 +392,17 @@ Kurtosis.
 #### `quantile`
 
 ``` purescript
-quantile :: Number -> [Number] -> Number
+quantile :: Int -> Sample -> Number
 ```
 
 Arbitrary quantile q of an unsorted list.  The quantile /q/ of /N/
 data points is the point whose (zero-based) index in the sorted
 data set is closest to /q(N-1)/.
 
-#### `quantileAsc`
+#### `quantile'`
 
 ``` purescript
-quantileAsc :: Number -> [Number] -> Number
+quantile' :: Int -> Sample -> Number
 ```
 
 As 'quantile' specialized for sorted data.
@@ -403,7 +410,7 @@ As 'quantile' specialized for sorted data.
 #### `covMatrix`
 
 ``` purescript
-covMatrix :: [[Number]] -> [[Number]]
+covMatrix :: [Sample] -> [[Number]]
 ```
 
 Covariance matrix.
@@ -411,7 +418,7 @@ Covariance matrix.
 #### `pearson`
 
 ``` purescript
-pearson :: [Number] -> [Number] -> Number
+pearson :: Sample -> Sample -> Number
 ```
 
 Pearson's product-moment correlation coefficient.
@@ -419,7 +426,7 @@ Pearson's product-moment correlation coefficient.
 #### `covar`
 
 ``` purescript
-covar :: [Number] -> [Number] -> Number
+covar :: Sample -> Sample -> Number
 ```
 
 Sample Covariance.
@@ -427,7 +434,7 @@ Sample Covariance.
 #### `linreg`
 
 ``` purescript
-linreg :: [Number] -> [Number] -> Tuple3 Number Number Number
+linreg :: Sample -> Sample -> Tuple3 Number Number Number
 ```
 
 Least-squares linear regression of /y/ against /x/ for a
@@ -438,7 +445,7 @@ coefficient /r/
 #### `devsq`
 
 ``` purescript
-devsq :: [Number] -> Number
+devsq :: Sample -> Number
 ```
 
 Returns the sum of square deviations from their sample mean.
