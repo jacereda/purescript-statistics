@@ -1,0 +1,23 @@
+{
+  "name": "purescript-statistics",
+  "version": "0.0.1",
+  "moduleType": [
+    "node"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-globals": "*",
+    "purescript-math": "*",
+    "purescript-tuples": "~0.3.0",
+    "purescript-foldable-traversable": "~0.3.1"
+  },
+  "devDependencies": {
+    "purescript-quickcheck": "~0.5.0",
+    "purescript-debug-foreign": "*"
+  }
+}
