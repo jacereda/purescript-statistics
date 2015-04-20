@@ -72,10 +72,10 @@ main = do
   assert $ mode [1, 1, 2, 4, 4] ~= Just 1
 
   tst "centralMoment"
-  assert $ centralMoment [] 0 == Nothing
-  assert $ centralMoment [1] 0 == Just 1
-  assert $ centralMoment [1] 1 == Just 0
-  quickCheck \xs -> centralMoment xs 2 ~= pvar xs
+  assert $ centralMoment 0 [] == Nothing
+  assert $ centralMoment 0 [1] == Just 1
+  assert $ centralMoment 1 [1] == Just 0
+  quickCheck \xs -> centralMoment 2 xs ~= pvar xs
 
   tst "pvar"
   assert $ pvar [] == Nothing

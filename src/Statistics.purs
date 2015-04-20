@@ -43,45 +43,45 @@ chkinf :: Number -> Maybe Number
 chkinf r = if isFinite r then Just r else Nothing
 
 -- | Maximum value.
-maximum :: Sample -> Maybe Number
+maximum :: Sample -> Maybe Point
 maximum = chkinf <<< U.maximum
 
 -- | Minimum value.
-minimum :: Sample -> Maybe Number
+minimum :: Sample -> Maybe Point
 minimum = chkinf <<< U.minimum
 
 -- | Mean.
-mean :: Sample -> Maybe Number
+mean :: Sample -> Maybe Point
 mean = chknan <<< U.mean
 
 -- | Harmonic mean.
-harmean :: Sample -> Maybe Number
+harmean :: Sample -> Maybe Point
 harmean xs = do
   guard $ length xs > 0
   guard $ all (>0) xs
   return $ U.harmean xs
 
 -- | Geometric mean.
-geomean :: Sample -> Maybe Number
+geomean :: Sample -> Maybe Point
 geomean = chknan <<< U.geomean
 
 -- | Median.
-median :: Sample -> Maybe Number
+median :: Sample -> Maybe Point
 median = chknan <<< U.median
 
 -- | Modes returns a sorted list of modes in descending order.
-modes :: Sample -> [Tuple Number Number]
+modes :: Sample -> [Tuple Int Point]
 modes = U.modes
 
 -- | Mode returns the mode of the list.
-mode :: Sample -> Maybe Number
+mode :: Sample -> Maybe Point
 mode xs = do
   guard $ length xs > 0
   return $ U.mode xs
 
 -- | Central moments.
-centralMoment :: Sample -> Number -> Maybe Number
-centralMoment xs = chknan <<< U.centralMoment xs
+centralMoment :: Int -> Sample -> Maybe Number
+centralMoment n = chknan <<< U.centralMoment n
 
 -- | Range.
 range :: Sample -> Maybe Number
@@ -126,17 +126,15 @@ kurt = chknan <<< U.kurt
 -- | Arbitrary quantile q of an unsorted list.  The quantile /q/ of /N/
 -- | data points is the point whose (zero-based) index in the sorted
 -- | data set is closest to /q(N-1)/.
-quantile :: Number -> Sample -> Either String Number
-quantile q = quantileAsc q <<< sort
+quantile :: Int -> Sample -> Either String Number
+quantile q = quantile' q <<< sort
 
 -- | As 'quantile' specialized for sorted data.
-quantileAsc :: Number -> Sample -> Either String Number
-quantileAsc _ [] = Left "quantile on empty list"
-quantileAsc q _ | q < 0 || q > 1 = Left "quantile out of range"
-quantileAsc q xs = if isNaN qa then Left "bad quantile index" else Right qa
-  where qa = U.quantileAsc q xs
-
-
+quantile' :: Int -> Sample -> Either String Number
+quantile' _ [] = Left "quantile on empty list"
+quantile' q _ | q < 0 || q > 1 = Left "quantile out of range"
+quantile' q xs = if isNaN qa then Left "bad quantile index" else Right qa
+  where qa = U.quantile' q xs
 
 -- | Calculate skew.
 skew :: Sample -> Maybe Number
