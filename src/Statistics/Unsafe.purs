@@ -49,14 +49,14 @@ median xs = m $ sort xs
         m x | even n = mean $ take 2 $ drop (i - 1) x
         m x = U.head  $ drop i x
         
--- | Modes returns a sorted list of modes in descending order.
+-- | Sorted array of modes in descending order.
 modes :: Sample -> [Tuple Int Point]
 modes = sortBy (comparing $ negate <<< fst)
         <<< map (\x -> Tuple (length x) (U.head x))
         <<< (group <<< sort)
   where comparing p x y = compare (p x) (p y)
 
--- | Mode returns the mode of the non-empty list.
+-- | Mode for the non-empty sample.
 mode :: Sample -> Point
 mode = snd <<< U.head <<< modes
 
@@ -174,7 +174,7 @@ linreg xs ys = let n = length xs
                     (sqrt $ (n * sXX - square sX) * (n * sYY - square sY))
                in tuple3 alpha beta r
 
--- | Returns the sum of square deviations from their sample mean.
+-- | Sum of square deviations from their sample mean.
 devsq :: Sample -> Number
 devsq xs = sum $ map (\x -> square (x-m)) xs
   where m = mean xs

@@ -56,7 +56,7 @@ Median.
 modes :: Sample -> [Tuple Int Point]
 ```
 
-Modes returns a sorted list of modes in descending order.
+Sorted array of modes in descending order.
 
 #### `mode`
 
@@ -64,7 +64,7 @@ Modes returns a sorted list of modes in descending order.
 mode :: Sample -> Maybe Point
 ```
 
-Mode returns the mode of the list.
+Mode.
 
 #### `centralMoment`
 
@@ -141,7 +141,7 @@ Calculates pearson skew.
 #### `covar`
 
 ``` purescript
-covar :: Sample -> Sample -> Maybe Number
+covar :: XYSample -> Maybe Number
 ```
 
 Sample Covariance.
@@ -157,7 +157,7 @@ Covariance matrix.
 #### `pearson`
 
 ``` purescript
-pearson :: Sample -> Sample -> Maybe Number
+pearson :: XYSample -> Maybe Number
 ```
 
 Pearson's product-moment correlation coefficient.
@@ -165,7 +165,7 @@ Pearson's product-moment correlation coefficient.
 #### `linreg`
 
 ``` purescript
-linreg :: Sample -> Sample -> Maybe (Tuple3 Number Number Number)
+linreg :: XYSample -> Maybe (Tuple3 Number Number Number)
 ```
 
 Least-squares linear regression of /y/ against /x/ for a
@@ -179,7 +179,7 @@ coefficient /r/.
 devsq :: Sample -> Maybe Number
 ```
 
-Returns the sum of square deviations from their sample mean.
+Sum of square deviations from their sample mean.
 
 
 ## Module Math.Statistics.Types
@@ -202,6 +202,13 @@ type Point = Number
 
 ``` purescript
 type Sample = [Point]
+```
+
+
+#### `XYSample`
+
+``` purescript
+type XYSample = [{ y :: Point, x :: Point }]
 ```
 
 
@@ -283,7 +290,7 @@ Median.
 modes :: Sample -> [Tuple Int Point]
 ```
 
-Modes returns a sorted list of modes in descending order.
+Sorted array of modes in descending order.
 
 #### `mode`
 
@@ -291,7 +298,7 @@ Modes returns a sorted list of modes in descending order.
 mode :: Sample -> Point
 ```
 
-Mode returns the mode of the non-empty list.
+Mode for the non-empty sample.
 
 #### `skew`
 
@@ -448,7 +455,7 @@ coefficient /r/
 devsq :: Sample -> Number
 ```
 
-Returns the sum of square deviations from their sample mean.
+Sum of square deviations from their sample mean.
 
 
 

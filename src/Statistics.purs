@@ -73,7 +73,7 @@ median = chknan <<< U.median
 modes :: Sample -> [Tuple Int Point]
 modes = U.modes
 
--- | Mode returns the mode of the list.
+-- | Mode.
 mode :: Sample -> Maybe Point
 mode xs = do
   guard $ length xs > 0
@@ -171,7 +171,7 @@ linreg xys = do
   guard $ length xys > 1
   return $ U.linreg ((_.x) <$> xys) ((_.y) <$> xys)
 
--- | Returns the sum of square deviations from their sample mean.
+-- | Sum of square deviations from their sample mean.
 devsq :: Sample -> Maybe Number
 devsq xs = do
   guard $ length xs > 0
