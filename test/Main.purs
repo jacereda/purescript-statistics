@@ -110,11 +110,11 @@ main = do
   assert $ iqr [5, 8, 4, 4, 6, 3, 8] == Just 4
 
   tst "covar"
-  assert $ covar [] [] == Nothing
-  assert $ covar [1] [1] == Nothing
-  assert $ covar [1,2] [2,4] == Just 1
-  assert $ covar [2.1, 2.5, 3.6, 4.0] [8, 10, 12, 14] == Just (6.8 / 3)
-  assert $ covar [2.1, 2.5, 4.0, 3.6] [8, 12, 14, 10] == Just (4.6 / 3)
+  assert $ covar [] == Nothing
+  assert $ covar [{x:1, y:1}] == Nothing
+  assert $ covar [{x:1, y:2}, {x:2, y:4}] == Just 1
+  assert $ covar [{x:2.1, y:8}, {x:2.5, y:10}, {x:3.6, y:12}, {x:4.0, y:14}] == Just (6.8 / 3)
+  assert $ covar [{x:2.1, y:8}, {x:2.5, y:12}, {x:4.0, y:14}, {x:3.6, y:10}] == Just (4.6 / 3)
 
   tst "covMatrix"
   assert $ covMatrix [] == Nothing
@@ -129,11 +129,19 @@ main = do
                      ] == Just [ [1, (-1)], [(-1), 1] ]
 
   tst "pearson"
-  assert $ pearson [] [] == Nothing
-  assert $ pearson [1] [1] == Nothing
-  assert $ pearson [1,1] [1,1] == Nothing
-  assert $ pearson [56, 56, 65, 65, 50, 25, 87, 44, 35]
-      [87, 91, 85, 91, 75, 28, 122, 66, 58] ~= Just 0.966194
+  assert $ pearson [] == Nothing
+  assert $ pearson [{x:1, y:1}] == Nothing
+  assert $ pearson [{x:1, y:1}, {x:1, y:1}] == Nothing
+  assert $ pearson [ {x:56, y:87}
+                   , {x:56, y:91}
+                   , {x:65, y:85}
+                   , {x:65, y:91}
+                   , {x:50, y:75}
+                   , {x:25, y:28}
+                   , {x:87, y:122}
+                   , {x:44, y:66}
+                   , {x:35, y:58}
+                   ] ~= Just 0.966194
 
   tst "skew"
   assert $ skew [] == Nothing
@@ -150,9 +158,9 @@ main = do
   assert $ pearsonSkew [1,2,1] ~= Just 1.732051
 
   tst "linreg"
-  assert $ linreg [] [] == Nothing
-  assert $ linreg [1] [1] == Nothing
-  assert $ linreg [1, 2] [2, 4] == Just (tuple3 0 2 1)
+  assert $ linreg [] == Nothing
+  assert $ linreg [{x:1, y:1}] == Nothing
+  assert $ linreg [{x:1, y:2}, {x:2, y:4}] == Just (tuple3 0 2 1)
 
   tst "devsq"
   assert $ devsq [] == Nothing

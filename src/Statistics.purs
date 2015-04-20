@@ -69,7 +69,7 @@ geomean = chknan <<< U.geomean
 median :: Sample -> Maybe Point
 median = chknan <<< U.median
 
--- | Modes returns a sorted list of modes in descending order.
+-- | Sorted array of modes in descending order.
 modes :: Sample -> [Tuple Int Point]
 modes = U.modes
 
@@ -145,12 +145,10 @@ pearsonSkew :: Sample -> Maybe Number
 pearsonSkew = chknan <<< U.pearsonSkew
 
 -- | Sample Covariance.
-covar :: Sample -> Sample -> Maybe Number
-covar xs ys = do
-  let lxs = length xs
-  guard $ lxs > 1
-  guard $ length ys == lxs
-  return $ U.covar xs ys
+covar :: XYSample -> Maybe Number
+covar xys = do
+  guard $ length xys > 1
+  return $ U.covar ((_.x) <$> xys) ((_.y) <$> xys)
 
 -- | Covariance matrix.
 covMatrix :: [Sample] -> Maybe [[Number]]
@@ -161,19 +159,17 @@ covMatrix xs = do
   where same (x:xs) = all (==x) xs
 
 -- | Pearson's product-moment correlation coefficient.
-pearson :: Sample -> Sample -> Maybe Number
-pearson xs = chknan <<< U.pearson xs
+pearson :: XYSample -> Maybe Number
+pearson xys = chknan $ U.pearson ((_.x) <$> xys) ((_.y) <$> xys)
 
 -- | Least-squares linear regression of /y/ against /x/ for a
 -- | collection of (/x/, /y/) data, in the form of (/b0/, /b1/, /r/)
 -- | where the regression is /y/ = /b0/ + /b1/ * /x/ with Pearson
 -- | coefficient /r/.
-linreg :: Sample -> Sample -> Maybe (Tuple3 Number Number Number)
-linreg xs ys = do
-  let lxs = length xs
-  guard $ lxs > 1
-  guard $ length ys == lxs
-  return $ U.linreg xs ys
+linreg :: XYSample -> Maybe (Tuple3 Number Number Number)
+linreg xys = do
+  guard $ length xys > 1
+  return $ U.linreg ((_.x) <$> xys) ((_.y) <$> xys)
 
 -- | Returns the sum of square deviations from their sample mean.
 devsq :: Sample -> Maybe Number
