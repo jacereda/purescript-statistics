@@ -78,15 +78,16 @@ stddevp = sqrt <<< pvar
 
 -- | Sample variance.
 var :: Sample -> Number
-var xs = (var' 0 0 0 xs) / (length xs - 1)
-  where var' _ _ s [] = s
-        var' m n s (x:xs) = var' nm (n + 1) (s + delta * (x - nm)) xs
-          where delta = x - m
-                nm = m + delta/(n + 1)
+var = var' 1
 
 -- | Population variance.
 pvar :: Sample -> Number
-pvar = centralMoment 2
+pvar = var' 0
+
+var' :: Number -> Sample -> Number
+var' n xs = sum (map d xs) / (length xs - n)
+  where m = mean xs
+        d x = square $ x - m
 
 -- | Central moments.
 centralMoment :: Int -> Sample -> Number

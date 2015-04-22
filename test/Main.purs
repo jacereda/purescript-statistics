@@ -97,6 +97,12 @@ main = do
   assert $ stddev [] == Nothing
   assert $ stddev [1] == Nothing
   assert $ stddev [1,1] == Just 0
+  assert $ stddev [ 26, 28, 30, 37, 33, 30
+                  , 29, 39, 49, 31, 38, 36
+                  , 33, 24, 34, 40, 29, 41
+                  , 40, 29, 35, 44, 32, 45
+                  , 35, 26, 42, 36, 37, 35
+                  ] ~= Just 6.072455240154362
 
   tst "stddevp"
   assert $ stddevp [] == Nothing
