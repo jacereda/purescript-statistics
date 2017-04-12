@@ -1,179 +1,203 @@
 module Test.Main where
 
-import Debug.Trace
-import Test.QuickCheck
-import Control.Monad.Eff
-import Data.Maybe
-import Data.Tuple
-import Data.Tuple.Nested(Tuple3(..), tuple3)
-import Data.Array(length)
-import Math(abs)
+import Prelude
+import Data.Foldable(all)
+import Test.QuickCheck ((<?>), quickCheck)
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Exception (EXCEPTION)
+import Control.Monad.Eff.Random (RANDOM)
+import Control.Monad.Eff.Console (CONSOLE, log, logShow)
+import Data.Maybe (Maybe(..))
+import Data.Tuple (Tuple(..), fst, snd)
+import Data.Tuple.Nested (tuple3)
+import Data.Array (zip, length)
+import Math (abs)
 
-import Math.Statistics
+import Math.Statistics (centralMoment, covMatrix, covar, devsq, geomean, harmean, iqr, linreg, maximum, mean, median, minimum, mode, modes, pearson, pearsonSkew, pvar, range, skew, stddev, stddevp, var)
+
+class AlmostEq a where
+  almostEq :: a -> a -> Boolean
+infix 4 almostEq as ~=
+
+instance almostEqNumber :: AlmostEq Number where
+  almostEq x y = abs (x - y) < 0.000001
+
+instance almostEqInt :: AlmostEq Int where
+  almostEq x y = x == y
+
+instance almostEqMaybe :: AlmostEq a => AlmostEq (Maybe a) where
+  almostEq (Just x) (Just y) = x ~= y
+  almostEq Nothing Nothing = true
+  almostEq _ _ = false
+
+instance almostEqTuple :: (AlmostEq a, AlmostEq b) => AlmostEq (Tuple a b) where
+  almostEq (Tuple x y)  (Tuple z t) = x ~= z && y ~= t
+
+instance almostEqArray :: AlmostEq a => AlmostEq (Array a) where
+  almostEq xs ys = length xs == length ys && all (\p -> fst p ~= snd p) (zip xs ys)
+
+instance almostEqUnit :: AlmostEq Unit where
+  almostEq x y = true
 
 
-(~=) :: Maybe Number -> Maybe Number -> Boolean
-(~=) (Just x) (Just y) = abs (x - y) < 0.000001
-(~=) Nothing Nothing = true
-(~=) _ _ = false
+assertAlmostEquals :: forall a e. AlmostEq a => Show a => a -> a -> Eff (console :: CONSOLE | e) Unit
+assertAlmostEquals a b = logShow $ a ~= b <?> show a <> " /= " <> show b
 
-infix 4 ~=
+infix 2 assertAlmostEquals as ~==
 
-tst :: forall e. String -> Eff (trace :: Trace |e) Unit
+
+
+tst :: forall e. String -> Eff (console :: CONSOLE |e) Unit
 tst x = do
-  trace $ "Testing " ++ x
+  log $ "Testing " <> x
 
+main :: forall e. Eff (console :: CONSOLE, exception :: EXCEPTION, random :: RANDOM | e) Unit
 main = do
   tst "maximum"
-  assert $ maximum [] == Nothing
-  assert $ maximum [1] == Just 1
-  assert $ maximum [1,2] == Just 2
-  assert $ maximum [2,1] == Just 2
+  maximum [] ~== Nothing
+  maximum [1.0] ~== Just 1.0
+  maximum [1.0,2.0] ~== Just 2.0
+  maximum [2.0,1.0] ~== Just 2.0
 
   tst "minimum"
-  assert $ minimum [] == Nothing
-  assert $ minimum [1] == Just 1
-  assert $ minimum [1,2] == Just 1
-  assert $ minimum [2,1] == Just 1
+  minimum [] ~== Nothing
+  minimum [1.0] ~== Just 1.0
+  minimum [1.0,2.0] ~== Just 1.0
+  minimum [2.0,1.0] ~== Just 1.0
 
   tst "mean"
-  assert $ mean [] == Nothing
-  assert $ mean [1] == Just 1
-  assert $ mean [4, 36, 45, 50, 75] ~= Just 42
+  mean [] ~== Nothing
+  mean [1.0] ~== Just 1.0
+  mean [4.0, 36.0, 45.0, 50.0, 75.0] ~== Just 42.0
 
   tst "harmean"
-  assert $ harmean [] == Nothing
-  assert $ harmean [1] == Just 1
-  assert $ harmean [1,2,4] == Just (12 / 7)
-  assert $ harmean [1,0,1] == Nothing
-  assert $ harmean [4, 36, 45, 50, 75] ~= Just 15
+  harmean [] ~== Nothing
+  harmean [1.0] ~== Just 1.0
+  harmean [1.0,2.0,4.0] ~== Just (12.0 / 7.0)
+  harmean [1.0,0.0,1.0] ~== Nothing
+  harmean [4.0, 36.0, 45.0, 50.0, 75.0] ~== Just 15.0
 
   tst "geomean"
-  assert $ geomean [] == Nothing
-  assert $ geomean [1] == Just 1
-  assert $ geomean [4, 36, 45, 50, 75] ~= Just 30
+  geomean [] ~== Nothing
+  geomean [1.0] ~== Just 1.0
+  geomean [4.0, 36.0, 45.0, 50.0, 75.0] ~== Just 30.0
 
   tst "median"
-  assert $ median [] == Nothing
-  assert $ median [1] == Just 1
-  assert $ median [3, 3, 5, 9, 11] ~= Just 5
-  assert $ median [3, 5, 7, 9] ~= Just 6
+  median [] ~== Nothing
+  median [1.0] ~== Just 1.0
+  median [3.0, 3.0, 5.0, 9.0, 11.0] ~== Just 5.0
+  median [3.0, 5.0, 7.0, 9.0] ~== Just 6.0
 
   tst "modes"
-  assert $ modes [] == []
-  assert $ modes [1] == [Tuple 1 1]
-  assert $ modes [1, 1, 2] == [Tuple 2 1, Tuple 1 2]
-  assert $ modes [2, 1, 1] == [Tuple 2 1, Tuple 1 2]
+  modes [] ~== []
+  modes [1.0] ~== [Tuple 1 1.0]
+  modes [1.0, 1.0, 2.0] ~== [Tuple 2 1.0, Tuple 1 2.0]
+  modes [2.0, 1.0, 1.0] ~== [Tuple 2 1.0, Tuple 1 2.0]
 
   tst "mode"
-  assert $ mode [] == Nothing
-  assert $ mode [1] == Just 1
-  assert $ mode [1, 3, 6, 6, 6, 6, 7, 7, 12, 12, 17] ~= Just 6
-  assert $ mode [1, 1, 2, 4, 4] ~= Just 1
+  mode [] ~== Nothing
+  mode [1.0] ~== Just 1.0
+  mode [1.0, 3.0, 6.0, 6.0, 6.0, 6.0, 7.0, 7.0, 12.0, 12.0, 17.0] ~== Just 6.0
+  mode [1.0, 1.0, 2.0, 4.0, 4.0] ~== Just 1.0
 
   tst "centralMoment"
-  assert $ centralMoment 0 [] == Nothing
-  assert $ centralMoment 0 [1] == Just 1
-  assert $ centralMoment 1 [1] == Just 0
+  centralMoment 0 [] ~== Nothing
+  centralMoment 0 [1.0] ~== Just 1.0
+  centralMoment 1 [1.0] ~== Just 0.0
   quickCheck \xs -> centralMoment 2 xs ~= pvar xs
 
   tst "pvar"
-  assert $ pvar [] == Nothing
-  assert $ pvar [1] == Just 0
-  assert $ pvar [1,2] == Just (1/4)
-  assert $ pvar [1,2,3] == Just (2/3)
+  pvar [] ~== Nothing
+  pvar [1.0] ~== Just 0.0
+  pvar [1.0,2.0] ~== Just (1.0/4.0)
+  pvar [1.0,2.0,3.0] ~== Just (2.0/3.0)
 
   tst "var"
-  assert $ var [] == Nothing
-  assert $ var [1] == Nothing
-  assert $ var [1,2] == Just (1/2)
-  assert $ var [1,2,3] == Just 1
+  var [] ~== Nothing
+  var [1.0] ~== Nothing
+  var [1.0,2.0] ~== Just (1.0/2.0)
+  var [1.0,2.0,3.0] ~== Just 1.0
 
   tst "range"
-  assert $ range [] == Nothing
-  assert $ range [1] == Just 0
+  range [] ~== Nothing
+  range [1.0] ~== Just 0.0
 
   tst "stddev"
-  assert $ stddev [] == Nothing
-  assert $ stddev [1] == Nothing
-  assert $ stddev [1,1] == Just 0
-  assert $ stddev [ 26, 28, 30, 37, 33, 30
-                  , 29, 39, 49, 31, 38, 36
-                  , 33, 24, 34, 40, 29, 41
-                  , 40, 29, 35, 44, 32, 45
-                  , 35, 26, 42, 36, 37, 35
-                  ] ~= Just 6.072455240154362
+  stddev [] ~== Nothing
+  stddev [1.0] ~== Nothing
+  stddev [1.0,1.0] ~== Just 0.0
+  stddev [ 26.0, 28.0, 30.0, 37.0, 33.0, 30.0
+         , 29.0, 39.0, 49.0, 31.0, 38.0, 36.0
+         , 33.0, 24.0, 34.0, 40.0, 29.0, 41.0
+         , 40.0, 29.0, 35.0, 44.0, 32.0, 45.0
+         , 35.0, 26.0, 42.0, 36.0, 37.0, 35.0
+         ] ~== Just 6.072455240154362
 
   tst "stddevp"
-  assert $ stddevp [] == Nothing
-  assert $ stddevp [1] == Just 0
-  assert $ stddevp [1,1] == Just 0
+  stddevp [] ~== Nothing
+  stddevp [1.0] ~== Just 0.0
+  stddevp [1.0,1.0] ~== Just 0.0
 
   tst "iqr"
-  assert $ iqr [] == Nothing
-  assert $ iqr [1] == Just 0
-  assert $ iqr [102, 104, 105, 107, 108, 109, 110, 112, 115, 116, 118] == Just 10
-  assert $ iqr [5, 8, 4, 4, 6, 3, 8] == Just 4
+  iqr [] ~== Nothing
+  iqr [1.0] ~== Just 0.0
+  iqr [102.0, 104.0, 105.0, 107.0, 108.0, 109.0, 110.0, 112.0, 115.0, 116.0, 118.0] ~== Just 10.0
+  iqr [5.0, 8.0, 4.0, 4.0, 6.0, 3.0, 8.0] ~== Just 4.0
 
   tst "covar"
-  assert $ covar [] == Nothing
-  assert $ covar [{x:1, y:1}] == Nothing
-  assert $ covar [{x:1, y:2}, {x:2, y:4}] == Just 1
-  assert $ covar [{x:2.1, y:8}, {x:2.5, y:10}, {x:3.6, y:12}, {x:4.0, y:14}] == Just (6.8 / 3)
-  assert $ covar [{x:2.1, y:8}, {x:2.5, y:12}, {x:4.0, y:14}, {x:3.6, y:10}] == Just (4.6 / 3)
+  covar [] ~== Nothing
+  covar [{x:1.0, y:1.0}] ~== Nothing
+  covar [{x:1.0, y:2.0}, {x:2.0, y:4.0}] ~== Just 1.0
+  covar [{x:2.1, y:8.0}, {x:2.5, y:10.0}, {x:3.6, y:12.0}, {x:4.0, y:14.0}] ~== Just (6.8 / 3.0)
+  covar [{x:2.1, y:8.0}, {x:2.5, y:12.0}, {x:4.0, y:14.0}, {x:3.6, y:10.0}] ~== Just (4.6 / 3.0)
 
   tst "covMatrix"
-  assert $ covMatrix [] == Nothing
-  assert $ covMatrix [ [1] ] == Nothing
-  assert $ covMatrix [ [1], [] ] == Nothing
-  assert $ covMatrix [ [1,2], [1] ] == Nothing
-  assert $ covMatrix [ [1,2]
-                     , [1,2]
-                     ] == Just [ [0.5,0.5], [0.5,0.5] ]
-  assert $ covMatrix [ [0, 1, 2]
-                     , [2, 1, 0]
-                     ] == Just [ [1, (-1)], [(-1), 1] ]
+  covMatrix [] ~== Nothing
+  covMatrix [ [1.0] ] ~== Nothing
+  covMatrix [ [1.0], [] ] ~== Nothing
+  covMatrix [ [1.0,2.0], [1.0] ] ~== Nothing
+  covMatrix [ [1.0,2.0]
+            , [1.0,2.0]
+            ] ~== Just [ [0.5,0.5], [0.5,0.5] ]
+  covMatrix [ [0.0, 1.0, 2.0]
+            , [2.0, 1.0, 0.0]
+            ] ~== Just [ [1.0, (-1.0)], [(-1.0), 1.0] ]
 
   tst "pearson"
-  assert $ pearson [] == Nothing
-  assert $ pearson [{x:1, y:1}] == Nothing
-  assert $ pearson [{x:1, y:1}, {x:1, y:1}] == Nothing
-  assert $ pearson [ {x:56, y:87}
-                   , {x:56, y:91}
-                   , {x:65, y:85}
-                   , {x:65, y:91}
-                   , {x:50, y:75}
-                   , {x:25, y:28}
-                   , {x:87, y:122}
-                   , {x:44, y:66}
-                   , {x:35, y:58}
-                   ] ~= Just 0.966194
-
+  pearson [] ~== Nothing
+  pearson [{x:1.0, y:1.0}] ~== Nothing
+  pearson [{x:1.0, y:1.0}, {x:1.0, y:1.0}] ~== Nothing
+  pearson [ {x:56.0, y:87.0}
+          , {x:56.0, y:91.0}
+          , {x:65.0, y:85.0}
+          , {x:65.0, y:91.0}
+          , {x:50.0, y:75.0}
+          , {x:25.0, y:28.0}
+          , {x:87.0, y:122.0}
+          , {x:44.0, y:66.0}
+          , {x:35.0, y:58.0}
+          ] ~== Just 0.966194
+  
   tst "skew"
-  assert $ skew [] == Nothing
-  assert $ skew [1] == Nothing
-  assert $ skew [1,1] == Nothing
-  assert $ skew [1,2] == Just 0
-  assert $ skew [1,2,1] ~= Just 0.707107
+  skew [] ~== Nothing
+  skew [1.0] ~== Nothing
+  skew [1.0,1.0] ~== Nothing
+  skew [1.0,2.0] ~== Just 0.0
+  skew [1.0,2.0,1.0] ~== Just 0.707107
 
   tst "pearsonSkew"
-  assert $ pearsonSkew [] == Nothing
-  assert $ pearsonSkew [1] == Nothing
-  assert $ pearsonSkew [1,1] == Nothing
-  assert $ pearsonSkew [1,2] == Just 0
-  assert $ pearsonSkew [1,2,1] ~= Just 1.732051
+  pearsonSkew [] ~== Nothing
+  pearsonSkew [1.0] ~== Nothing
+  pearsonSkew [1.0,1.0] ~== Nothing
+  pearsonSkew [1.0,2.0] ~== Just 0.0
+  pearsonSkew [1.0,2.0,1.0] ~== Just 1.732051
 
   tst "linreg"
-  assert $ linreg [] == Nothing
-  assert $ linreg [{x:1, y:1}] == Nothing
-  assert $ linreg [{x:1, y:2}, {x:2, y:4}] == Just (tuple3 0 2 1)
+  linreg [] ~== Nothing
+  linreg [{x:1.0, y:1.0}] ~== Nothing
+  linreg [{x:1.0, y:2.0}, {x:2.0, y:4.0}] ~== Just (tuple3 0.0 2.0 1.0)
 
   tst "devsq"
-  assert $ devsq [] == Nothing
-  assert $ devsq [1] == Just 0
-  assert $ devsq [1,2,3,4,6] == Just 14.8
-
-
-
-assert :: Boolean -> QC Unit
-assert = quickCheck' 1
+  devsq [] ~== Nothing
+  devsq [1.0] ~== Just 0.0
+  devsq [1.0,2.0,3.0,4.0,6.0] ~== Just 14.8

@@ -1,25 +1,21 @@
 module Math.Statistics.Unsafe where
 
+import Prelude(otherwise, negate, (<), (>=), (+), (-), (/), (*), ($), compare, (<<<), map, bind, pure, between)
+import Data.Int(even, toNumber, round)
 import Global(nan, infinity)
-import Math(sqrt, pow, max, min, abs, round)
-import Data.Maybe
-import Data.Tuple(Tuple(..), fst, snd, uncurry)
-import Data.Tuple.Nested(Tuple3(..), tuple2, tuple3)
-import Data.Foldable(foldl, foldr, sum, product)
-import Data.Array(length, map, group, sort, sortBy, filter, zipWith, drop, take)
-import qualified Data.Array.Unsafe as U
-import Prelude.Unsafe(unsafeIndex)
+import Math(sqrt, pow, max, min, abs)
+import Data.NonEmpty as NE
+import Data.Tuple(Tuple(..), fst, snd)
+import Data.Tuple.Nested(Tuple3, tuple3)
+import Data.Foldable(foldl, sum, product)
+import Data.Array(length, group, sort, sortBy, zipWith, drop, take, unsafeIndex)
+import Data.Array.Partial as U
+import Partial.Unsafe(unsafePartial)
 
-import Math.Statistics.Types
+import Math.Statistics.Types(Point, Sample)
 
 square :: Number -> Number
 square x = x * x
-
-div :: Int -> Int -> Int
-div x y = 0 .|. (x / y)
-
-even :: Int -> Boolean
-even x = x `div` 2 == x / 2
 
 -- | Maximum value.
 maximum :: Sample -> Point
@@ -31,34 +27,35 @@ minimum = foldl min infinity
 
 -- | Mean.
 mean :: Sample -> Point
-mean xs = sum xs / length xs
+mean xs = sum xs / toNumber (length xs)
 
 -- | Harmonic mean.
 harmean :: Sample -> Point
-harmean xs = length xs / (sum $ map (1 /) xs)
+harmean xs = toNumber (length xs) / (sum $ map (1.0 / _) xs)
 
 -- | Geometric mean.
 geomean :: Sample -> Point
-geomean xs = (product xs) `pow` (1 / length xs)
+geomean xs = (product xs) `pow` (1.0 / toNumber (length xs))
 
 -- | Median.
 median :: Sample -> Point
 median xs = m $ sort xs
   where n = length xs
-        i = n `div` 2
+        i = n / 2
         m x | even n = mean $ take 2 $ drop (i - 1) x
-        m x = U.head  $ drop i x
+        m x = unsafePartial $ U.head  $ drop i x
         
 -- | Sorted array of modes in descending order.
-modes :: Sample -> [Tuple Int Point]
+modes :: Sample -> Array (Tuple Int Point)
 modes = sortBy (comparing $ negate <<< fst)
-        <<< map (\x -> Tuple (length x) (U.head x))
-        <<< (group <<< sort)
+        <<< map (\x -> Tuple (nelength x) (NE.head x))
+        <<< group <<< sort
   where comparing p x y = compare (p x) (p y)
+        nelength (NE.NonEmpty x xs) = 1 + length xs
 
 -- | Mode for the non-empty sample.
 mode :: Sample -> Point
-mode = snd <<< U.head <<< modes
+mode = snd <<< unsafePartial U.head <<< modes
 
 -- | Calculate skew.
 skew :: Sample -> Number
@@ -66,7 +63,7 @@ skew xs = (centralMoment 3 xs) / ((pvar xs) `pow` 1.5)
 
 -- | Calculates pearson skew.
 pearsonSkew :: Sample -> Number
-pearsonSkew xs = 3 * (mean xs - median xs) / stddev xs
+pearsonSkew xs = 3.0 * (mean xs - median xs) / stddev xs
 
 -- | Standard deviation of sample.
 stddev :: Sample -> Number
@@ -84,15 +81,15 @@ var = var' 1
 pvar :: Sample -> Number
 pvar = var' 0
 
-var' :: Number -> Sample -> Number
-var' n xs = sum (map d xs) / (length xs - n)
+var' :: Int -> Sample -> Number
+var' n xs = sum (map d xs) / toNumber (length xs - n)
   where m = mean xs
         d x = square $ x - m
 
 -- | Central moments.
 centralMoment :: Int -> Sample -> Number
-centralMoment 1 _ = 0
-centralMoment r xs = (sum (map (\x -> (x-m) `pow` r) xs)) / n
+centralMoment 1 _ = 0.0
+centralMoment r xs = (sum (map (\x -> (x-m) `pow` (toNumber r)) xs)) / (toNumber n)
     where m = mean xs
           n = length xs
 
@@ -112,38 +109,38 @@ iqr = iqr' <<< sort
 -- | Interquartile range for sorted data.
 iqr' :: Sample -> Number
 iqr' xs = range $ take (length xs - 2*q) $ drop q xs
-  where q = ((length xs)-1) `div` 4
+  where q = ((length xs)-1) / 4
 
 -- | Kurtosis.
 kurt :: Sample -> Number
-kurt xs = ((centralMoment 4 xs) / square (pvar xs)) - 3
+kurt xs = ((centralMoment 4 xs) / square (pvar xs)) - 3.0
 
 -- | Arbitrary quantile q of an unsorted list.  The quantile /q/ of /N/
 -- | data points is the point whose (zero-based) index in the sorted
 -- | data set is closest to /q(N-1)/.
-quantile :: Int -> Sample -> Number
+quantile :: Number -> Sample -> Number
 quantile q = quantile' q <<< sort
 
 -- | As 'quantile' specialized for sorted data.
-quantile' :: Int -> Sample -> Number
+quantile' :: Number -> Sample -> Number
 quantile' _ [] = nan
-quantile' q xs = qa q xs
-  where quantIndex :: Int -> Number -> Int
-        quantIndex len q = case round $ q * (len - 1) of
-          idx | idx < 0    -> nan
-          idx | idx >= len -> nan
+quantile' q xs = if between 0.0 1.0 q
+                 then unsafePartial $ unsafeIndex xs $ quantIndex $ length xs
+                 else nan
+  where quantIndex :: Int -> Int
+        quantIndex len = case round (q * toNumber (len - 1)) of
+          idx | idx < 0    -> 0
+          idx | idx >= len -> len - 1
           idx | otherwise  -> idx
-        qa q xs | q < 0 || q > 1 = nan
-        qa q xs = xs `unsafeIndex` (quantIndex (length xs) q)
 
 
 -- | Covariance matrix.
-covMatrix :: [Sample] -> [[Number]]
+covMatrix :: Array Sample -> Array (Array Number)
 covMatrix xs = do
   a <- xs
-  return $ do
+  pure $ do
     b <- xs
-    return $ covar a b
+    pure $ covar a b
 
 -- | Pearson's product-moment correlation coefficient.
 pearson :: Sample -> Sample -> Number
@@ -151,7 +148,7 @@ pearson x y = covar x y / (stddev x * stddev y)
 
 -- | Sample Covariance.
 covar :: Sample -> Sample -> Number
-covar xs ys = sum (zipWith (*) (map f1 xs) (map f2 ys)) / (n-1)
+covar xs ys = sum (zipWith (*) (map f1 xs) (map f2 ys)) / (toNumber $ n-1)
     where n = length xs
           m1 = mean xs
           m2 = mean ys
@@ -163,7 +160,7 @@ covar xs ys = sum (zipWith (*) (map f1 xs) (map f2 ys)) / (n-1)
 -- | where the regression is /y/ = /b0/ + /b1/ * /x/ with Pearson
 -- | coefficient /r/
 linreg :: Sample -> Sample -> Tuple3 Number Number Number
-linreg xs ys = let n = length xs
+linreg xs ys = let n = toNumber $ length xs
                    sX = sum xs
                    sY = sum ys
                    sXX = sum $ map square xs

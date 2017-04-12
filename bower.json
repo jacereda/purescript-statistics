@@ -1,9 +1,10 @@
 {
   "name": "purescript-statistics",
-  "version": "0.0.1",
-  "moduleType": [
-    "node"
-  ],
+  "license": "MIT",    
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jacereda/purescript-statistics.git"
+  },
   "ignore": [
     "**/.*",
     "node_modules",
@@ -11,13 +12,12 @@
     "output"
   ],
   "dependencies": {
-    "purescript-globals": "*",
-    "purescript-math": "*",
-    "purescript-tuples": "~0.3.0",
-    "purescript-foldable-traversable": "~0.3.1"
+    "purescript-globals": "^3.0.0",
+    "purescript-math": "^2.0.0",
+    "purescript-tuples": "^4.0.0",
+    "purescript-foldable-traversable": "^3.0.0"
   },
   "devDependencies": {
-    "purescript-quickcheck": "~0.5.0",
-    "purescript-debug-foreign": "*"
+      "purescript-quickcheck": "^4.0.0"
   }
 }
