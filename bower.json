@@ -11,14 +11,13 @@
     "bower_components",
     "output"
   ],
-  "dependencies": {
-    "purescript-globals": "^3.0.0",
-    "purescript-math": "^2.0.0",
-    "purescript-tuples": "^4.0.0",
-    "purescript-foldable-traversable": "^3.0.0",
-    "purescript-integers": "^3.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "purescript-quickcheck": "^4.0.0"
+    "purescript-globals": "^4.0.0",
+    "purescript-math": "^2.1.1",
+    "purescript-tuples": "^5.0.0",
+    "purescript-foldable-traversable": "^4.0.0",
+    "purescript-integers": "^4.0.0",
+    "purescript-quickcheck": "^5.0.0"
   }
 }

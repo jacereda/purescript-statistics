@@ -3,10 +3,8 @@ module Test.Main where
 import Prelude
 import Data.Foldable(all)
 import Test.QuickCheck ((<?>), quickCheck)
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Exception (EXCEPTION)
-import Control.Monad.Eff.Random (RANDOM)
-import Control.Monad.Eff.Console (CONSOLE, log, logShow)
+import Effect (Effect)
+import Effect.Console (log, logShow)
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..), fst, snd)
 import Data.Tuple.Nested (tuple3)
@@ -40,18 +38,16 @@ instance almostEqUnit :: AlmostEq Unit where
   almostEq x y = true
 
 
-assertAlmostEquals :: forall a e. AlmostEq a => Show a => a -> a -> Eff (console :: CONSOLE | e) Unit
+assertAlmostEquals :: forall a. AlmostEq a => Show a => a -> a -> Effect Unit
 assertAlmostEquals a b = logShow $ a ~= b <?> show a <> " /= " <> show b
 
 infix 2 assertAlmostEquals as ~==
 
-
-
-tst :: forall e. String -> Eff (console :: CONSOLE |e) Unit
+tst :: String -> Effect Unit
 tst x = do
   log $ "Testing " <> x
 
-main :: forall e. Eff (console :: CONSOLE, exception :: EXCEPTION, random :: RANDOM | e) Unit
+main :: Effect Unit
 main = do
   tst "maximum"
   maximum [] ~== Nothing
@@ -177,7 +173,7 @@ main = do
           , {x:44.0, y:66.0}
           , {x:35.0, y:58.0}
           ] ~== Just 0.966194
-  
+
   tst "skew"
   skew [] ~== Nothing
   skew [1.0] ~== Nothing

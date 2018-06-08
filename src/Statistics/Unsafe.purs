@@ -1,14 +1,14 @@
 module Math.Statistics.Unsafe where
 
-import Prelude(otherwise, negate, (<), (>=), (+), (-), (/), (*), ($), compare, (<<<), map, bind, pure, between)
+import Prelude hiding(max)
 import Data.Int(even, toNumber, round)
 import Global(nan, infinity)
 import Math(sqrt, pow, max, min, abs)
-import Data.NonEmpty as NE
 import Data.Tuple(Tuple(..), fst, snd)
 import Data.Tuple.Nested(Tuple3, tuple3)
 import Data.Foldable(foldl, sum, product)
 import Data.Array(length, group, sort, sortBy, zipWith, drop, take, unsafeIndex)
+import Data.Array.NonEmpty as NE
 import Data.Array.Partial as U
 import Partial.Unsafe(unsafePartial)
 
@@ -44,14 +44,13 @@ median xs = m $ sort xs
         i = n / 2
         m x | even n = mean $ take 2 $ drop (i - 1) x
         m x = unsafePartial $ U.head  $ drop i x
-        
+
 -- | Sorted array of modes in descending order.
 modes :: Sample -> Array (Tuple Int Point)
 modes = sortBy (comparing $ negate <<< fst)
-        <<< map (\x -> Tuple (nelength x) (NE.head x))
+        <<< map (\x -> Tuple (NE.length x) (NE.head x))
         <<< group <<< sort
   where comparing p x y = compare (p x) (p y)
-        nelength (NE.NonEmpty x xs) = 1 + length xs
 
 -- | Mode for the non-empty sample.
 mode :: Sample -> Point
@@ -101,7 +100,7 @@ range xs = maximum xs - minimum xs
 avgdev :: Sample -> Number
 avgdev xs = mean $ map (\x -> abs(x - m)) xs
   where m = mean xs
-          
+
 -- | Interquartile range.
 iqr :: Sample -> Number
 iqr = iqr' <<< sort
