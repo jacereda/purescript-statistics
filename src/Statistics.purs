@@ -1,30 +1,31 @@
-module Math.Statistics( avgdev
-                      , maximum
-                      , minimum
-                      , mean
-                      , harmean
-                      , geomean
-                      , median
-                      , modes
-                      , mode
-                      , centralMoment
-                      , pvar
-                      , var
-                      , iqr
-                      , iqr'
-                      , covar
-                      , covMatrix
-                      , range
-                      , stddev
-                      , stddevp
-                      , pearson
-                      , skew
-                      , pearsonSkew
-                      , linreg
-                      , devsq
-                      , kurt
-                      , quantile
-                      ) where
+module Math.Statistics
+  ( avgdev
+  , maximum
+  , minimum
+  , mean
+  , harmean
+  , geomean
+  , median
+  , modes
+  , mode
+  , centralMoment
+  , pvar
+  , var
+  , iqr
+  , iqr'
+  , covar
+  , covMatrix
+  , range
+  , stddev
+  , stddevp
+  , pearson
+  , skew
+  , pearsonSkew
+  , linreg
+  , devsq
+  , kurt
+  , quantile
+  ) where
 
 import Prelude
 
@@ -99,8 +100,8 @@ avgdev = chknan <<< U.avgdev
 -- | Standard deviation of sample.
 stddev :: Sample -> Maybe Number
 stddev xs = do
-    guard $ length xs > 1
-    pure $ U.stddev xs
+  guard $ length xs > 1
+  pure $ U.stddev xs
 
 -- | Standard deviation of population.
 stddevp :: Sample -> Maybe Number
@@ -139,7 +140,8 @@ quantile' :: Number -> Sample -> Either String Number
 quantile' _ [] = Left "quantile on empty list"
 quantile' q _ | not (between 0.0 1.0 q) = Left "quantile out of range"
 quantile' q xs = if isNaN qa then Left "bad quantile index" else Right qa
-  where qa = U.quantile' q xs
+  where
+  qa = U.quantile' q xs
 
 -- | Calculate skew.
 skew :: Sample -> Maybe Number
@@ -161,7 +163,8 @@ covMatrix xs = do
   guard $ length xs > 1
   guard $ same $ map length xs
   pure $ U.covMatrix xs
-  where same ls = all (_ == unsafePartial P.head ls) ls
+  where
+  same ls = all (_ == unsafePartial P.head ls) ls
 
 -- | Pearson's product-moment correlation coefficient.
 pearson :: XYSample -> Maybe Number

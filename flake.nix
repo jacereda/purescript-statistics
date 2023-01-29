@@ -19,21 +19,22 @@
             purescript
             spago
           ];
-#          shellHook = ''
-#            ${config.checks.pre-commit-check.shellHook}
-#          '';
+          shellHook = ''
+            ${config.checks.pre-commit-check.shellHook}
+          '';
         };
-#        checks = {
-#          pre-commit-check = pre-commit-hooks.lib.${system}.run {
-#            src = ./.;
-#            hooks = {
-#              deadnix.enable = true;
-#              nixpkgs-fmt.enable = true;
-#              purs-tidy.enable = true;
-#              statix.enable = true;
-#            };
-#          };
-#        };
+        checks = {
+          pre-commit-check = pre-commit-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              deadnix.enable = true;
+              dhall-format.enable = true;
+              nixpkgs-fmt.enable = true;
+              purs-tidy.enable = true;
+              statix.enable = true;
+            };
+          };
+        };
       };
     };
 }
