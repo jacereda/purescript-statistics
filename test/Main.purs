@@ -9,7 +9,7 @@ import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..), fst, snd)
 import Data.Tuple.Nested (tuple3)
 import Data.Array (zip, length)
-import Math (abs)
+import Data.Number (abs)
 
 import Math.Statistics (centralMoment, covMatrix, covar, devsq, geomean, harmean, iqr, linreg, maximum, mean, median, minimum, mode, modes, pearson, pearsonSkew, pvar, range, skew, stddev, stddevp, var)
 
@@ -35,7 +35,7 @@ instance almostEqArray :: AlmostEq a => AlmostEq (Array a) where
   almostEq xs ys = length xs == length ys && all (\p -> fst p ~= snd p) (zip xs ys)
 
 instance almostEqUnit :: AlmostEq Unit where
-  almostEq x y = true
+  almostEq _ _ = true
 
 
 assertAlmostEquals :: forall a. AlmostEq a => Show a => a -> a -> Effect Unit

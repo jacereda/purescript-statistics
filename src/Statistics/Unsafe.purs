@@ -1,18 +1,17 @@
 module Math.Statistics.Unsafe where
 
-import Prelude hiding(max)
-import Data.Int(even, toNumber, round)
-import Global(nan, infinity)
-import Math(sqrt, pow, max, min, abs)
-import Data.Tuple(Tuple(..), fst, snd)
-import Data.Tuple.Nested(Tuple3, tuple3)
-import Data.Foldable(foldl, sum, product)
-import Data.Array(length, group, sort, sortBy, zipWith, drop, take, unsafeIndex)
+import Prelude hiding (max, min)
+
+import Data.Array (length, group, sort, sortBy, zipWith, drop, take, unsafeIndex)
 import Data.Array.NonEmpty as NE
 import Data.Array.Partial as U
-import Partial.Unsafe(unsafePartial)
-
-import Math.Statistics.Types(Point, Sample)
+import Data.Foldable (foldl, sum, product)
+import Data.Int (even, toNumber, round)
+import Data.Number (nan, infinity, sqrt, pow, max, min, abs)
+import Data.Tuple (Tuple(..), fst, snd)
+import Data.Tuple.Nested (Tuple3, tuple3)
+import Math.Statistics.Types (Point, Sample)
+import Partial.Unsafe (unsafePartial)
 
 square :: Number -> Number
 square x = x * x

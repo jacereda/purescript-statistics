@@ -1,4 +1,5 @@
-module Math.Statistics( maximum
+module Math.Statistics( avgdev
+                      , maximum
                       , minimum
                       , mean
                       , harmean
@@ -10,6 +11,7 @@ module Math.Statistics( maximum
                       , pvar
                       , var
                       , iqr
+                      , iqr'
                       , covar
                       , covMatrix
                       , range
@@ -20,22 +22,24 @@ module Math.Statistics( maximum
                       , pearsonSkew
                       , linreg
                       , devsq
+                      , kurt
+                      , quantile
                       ) where
 
 import Prelude
-import Global(isNaN, isFinite)
-import Data.Tuple(Tuple)
-import Data.Tuple.Nested(Tuple3)
-import Data.Maybe(Maybe(..))
-import Data.Either(Either(..))
-import Data.Array(sort, length)
-import Data.Array.Partial as P
-import Data.Foldable(all)
-import Control.MonadPlus(guard)
-import Partial.Unsafe(unsafePartial)
 
-import Math.Statistics.Types(Point, Sample, XYSample)
+import Control.MonadPlus (guard)
+import Data.Array (sort, length)
+import Data.Array.Partial as P
+import Data.Either (Either(..))
+import Data.Foldable (all)
+import Data.Maybe (Maybe(..))
+import Data.Number (isNaN, isFinite)
+import Data.Tuple (Tuple)
+import Data.Tuple.Nested (Tuple3)
+import Math.Statistics.Types (Point, Sample, XYSample)
 import Math.Statistics.Unsafe as U
+import Partial.Unsafe (unsafePartial)
 
 chknan :: Number -> Maybe Number
 chknan r = if isNaN r then Nothing else Just r
