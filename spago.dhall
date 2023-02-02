@@ -1,4 +1,5 @@
 { name = "statistics"
+, license = "MIT"
 , dependencies =
   [ "arrays"
   , "console"
