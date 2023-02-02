@@ -6,7 +6,7 @@ Some statistics functions for PureScript.
 ## Installation
 
 ```
-	bower install purescript-statistics
+	spago install statistics
 ```
 
 ## Documentation
