@@ -5,9 +5,10 @@
     nixpkgs.url = "github:NixOS/nixpkgs";
     flake-parts.url = "github:hercules-ci/flake-parts";
     pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
+    purescript-overlay.url = "github:thomashoneyman/purescript-overlay";
   };
 
-  outputs = inputs@{ flake-parts, pre-commit-hooks, ... }:
+  outputs = inputs@{ flake-parts, pre-commit-hooks, purescript-overlay, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" "aarch64-darwin" ];
       perSystem = { config, pkgs, system, ... }: {
@@ -17,7 +18,7 @@
             nodePackages.purs-tidy
             nodejs
             purescript
-            spago
+            purescript-overlay.packages.${system}.spago
           ];
           shellHook = ''
             ${config.checks.pre-commit-check.shellHook}

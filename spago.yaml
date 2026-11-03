@@ -1,0 +1,26 @@
+package:
+  name: statistics
+  publish:
+    version: 0.3.3
+    license: MIT
+    location:
+      githubOwner: jacereda
+      githubRepo: purescript-statistics
+  dependencies:
+    - arrays: ">=7.2.0 <8.0.0"
+    - control: ">=6.0.0 <7.0.0"
+    - either: ">=6.1.0 <7.0.0"
+    - foldable-traversable: ">=6.0.0 <7.0.0"
+    - integers: ">=6.0.0 <7.0.0"
+    - maybe: ">=6.0.0 <7.0.0"
+    - numbers: ">=9.0.0 <10.0.0"
+    - partial: ">=4.0.0 <5.0.0"
+    - prelude: ">=6.0.1 <7.0.0"
+    - tuples: ">=7.0.0 <8.0.0"
+  test:
+    main: Test.Main
+    dependencies:
+      - console: ">=6.0.0 <7.0.0"
+      - effect: ">=4.0.0 <5.0.0"
+      - quickcheck: ">=8.0.1 <9.0.0"
+workspace: {}
