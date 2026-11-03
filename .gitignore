@@ -9,3 +9,4 @@ node_modules/
 .spago
 result
 .pre-commit-config.yaml
+/spago.lock
